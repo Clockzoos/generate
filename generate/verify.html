@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clock- Hub - Session Verification</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+        background: radial-gradient(circle at center, #1e1e2f 0%, #0d0d15 100%);
+        color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+    }
+    .card {
+        background: rgba(28, 28, 36, 0.85); backdrop-filter: blur(12px); padding: 40px 30px;
+        border-radius: 20px; text-align: center; width: 100%; max-width: 400px;
+        border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    h2 { font-size: 22px; color: #fff; margin-bottom: 10px; }
+    p { font-size: 13px; color: #9494a0; margin-bottom: 20px; line-height: 1.5; }
+    .gen-btn {
+        background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none;
+        padding: 14px 20px; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer;
+        width: 100%; text-decoration: none; display: inline-block; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2 id="titleText">Checking Session...</h2>
+    <p id="descText">Please wait, the system is validating your Linkvertise access.</p>
+    
+    <div id="actionArea" style="display: none;">
+        <a href="index.html" class="gen-btn">Enter Generator Page</a>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+
+    setTimeout(() => {
+        if (token && token.startsWith("CLOCK-")) {
+            let sessionData = {
+                startTime: Date.now(),
+                count: 0 
+            };
+            localStorage.setItem("clock_session", JSON.stringify(sessionData));
+
+            document.getElementById("titleText").textContent = "Verification Successful!";
+            document.getElementById("descText").textContent = "Session generator is active! You have a quota of 2 key generations valid for 2 hours.";
+            document.getElementById("actionArea").style.display = "block";
+        } else {
+            document.getElementById("titleText").textContent = "Access Denied!";
+            document.getElementById("descText").textContent = "Invalid token or you attempted to bypass without passing Linkvertise.";
+            document.getElementById("descText").style.color = "#ef4444";
+        }
+    }, 1500);
+</script>
+
+</body>
+</html>
