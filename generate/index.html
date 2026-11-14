@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clock- Hub - Key Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+        background: radial-gradient(circle at center, #1e1e2f 0%, #0d0d15 100%);
+        color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+    }
+    .card {
+        background: rgba(28, 28, 36, 0.85); backdrop-filter: blur(12px); padding: 40px 30px;
+        border-radius: 20px; text-align: center; width: 100%; max-width: 400px;
+        border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    h2 { font-size: 24px; color: #fff; margin-bottom: 5px; }
+    p { font-size: 13px; color: #9494a0; margin-bottom: 20px; line-height: 1.5; }
+    .gen-btn {
+        background: linear-gradient(135deg, #5865f2, #4752c4); color: white; border: none;
+        padding: 14px 20px; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer;
+        width: 100%; transition: 0.3s; box-shadow: 0 8px 20px rgba(88, 101, 242, 0.4);
+        margin-bottom: 15px;
+    }
+    .gen-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(88, 101, 242, 0.6); }
+    .gen-btn:disabled { background: #3c3c4f; cursor: not-allowed; box-shadow: none; opacity: 0.7; }
+    
+    input {
+        width: 100%; padding: 12px; background: rgba(15, 15, 20, 0.8);
+        border: 1.5px solid #2d2d3b; color: #43e97b; border-radius: 10px;
+        text-align: center; font-size: 14px; font-weight: 600; margin-top: 10px; outline: none;
+    }
+    .limit-info { font-size: 12px; color: #facc15; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>CLOCK- HUB</h2>
+    <p>Generate your exclusive key here. Maximum of 2 key generations per session (Valid for 2 Hours)!</p>
+    
+    <button class="gen-btn" id="genBtn" onclick="generateKey()">Generate New Key</button>
+    
+    <div id="resultBox" style="display: none;">
+        <input type="text" id="keyOutput" readonly>
+    </div>
+    
+    <div class="limit-info" id="limitText">Generation quota left: 2/2</div>
+    
+    <!-- Linkvertise button if quota is exhausted -->
+    <div id="linkvertiseBox" style="display: none; margin-top: 20px;">
+        <p style="color: #ef4444; font-size: 12px;">Quota exhausted! Please complete Linkvertise to renew your session.</p>
+        <a href="https://link-hub.net/7791978/7v5R3sGQl4S1" class="gen-btn" style="text-decoration:none; display:block; background: #eab308; color:#000;">Get New Session</a>
+    </div>
+</div>
+
+<script>
+    const BIN_ID = "6af7f649ac6210605a868c2b";
+    const MASTER_KEY = "$2a$10$7kUozSyzkNytbUxnN7/kv.xInV14ItUgvNAWdjKEswZ0M.DDWgL/e";
+
+    let sessionData = JSON.parse(localStorage.getItem("clock_session") || "null");
+    let now = Date.now();
+
+    if (!sessionData || (now - sessionData.startTime > 7200000)) {
+        sessionData = { startTime: now, count: 2 }; 
+        localStorage.setItem("clock_session", JSON.stringify(sessionData));
+    }
+
+    updateUI();
+
+    function updateUI() {
+        let remaining = 2 - sessionData.count;
+        if (remaining < 0) remaining = 0;
+        document.getElementById("limitText").textContent = `Generation quota left: ${remaining}/2`;
+        
+        if (remaining <= 0) {
+            document.getElementById("genBtn").disabled = true;
+            document.getElementById("genBtn").textContent = "Quota Exhausted";
+            document.getElementById("linkvertiseBox").style.display = "block";
+        }
+    }
+
+    function generateRandomString() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let result = "";
+        for (let i = 0; i < 12; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return "CLOCK-" + result;
+    }
+
+    async function generateKey() {
+        if (sessionData.count >= 2) return;
+
+        const btn = document.getElementById("genBtn");
+        btn.disabled = true;
+        btn.textContent = "Processing...";
+
+        const newKey = generateRandomString();
+        const expireTime = Date.now() + (24 * 60 * 60 * 1000); // 24 Hours validity in JSONBin
+
+        try {
+            let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: { 'X-Master-Key': MASTER_KEY }
+            });
+            let result = await response.json();
+            let keysArray = result.record.keys || [];
+
+            let currentTime = Date.now();
+            keysArray = keysArray.filter(item => item.expire > currentTime);
+
+            keysArray.push({ key: newKey, expire: expireTime });
+
+            let updateResponse = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
+                body: JSON.stringify({ keys: keysArray })
+            });
+
+            if (updateResponse.ok) {
+                sessionData.count++;
+                localStorage.setItem("clock_session", JSON.stringify(sessionData));
+
+                document.getElementById("keyOutput").value = newKey;
+                document.getElementById("resultBox").style.display = "block";
+                updateUI();
+                if (2 - sessionData.count > 0) {
+                    btn.disabled = false;
+                    btn.textContent = "Generate New Key";
+                }
+            } else {
+                alert("Failed to save key to server.");
+                btn.disabled = false;
+                btn.textContent = "Generate New Key";
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Network error.");
+            btn.disabled = false;
+            btn.textContent = "Generate New Key";
+        }
+    }
+</script>
+
+</body>
+</html>
