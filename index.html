@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VEZC-HYB Key System</title>
+    <title>VEZC-HYB Key System Platform</title>
     <link rel="icon" type="image/jpeg" href="https://i.ibb.co.com/XZJcwxzw/0f94800fa0049e5dad9ebc027bd54e3c.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --bg-primary: #000000;
@@ -19,6 +20,7 @@
             --color-text: #ffffff;
             --color-text-muted: #a0a0a0;
             --color-success: #22c55e;
+            --color-danger: #ef4444;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,7 +42,7 @@
             border-radius: 20px;
             padding: 36px;
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             text-align: center;
             box-shadow: 0 15px 35px rgba(0,0,0,0.9);
         }
@@ -72,6 +74,8 @@
         }
         .btn:hover { background: var(--color-primary-hover); }
         .btn-success { background: var(--color-success); color: #fff; }
+        .btn-secondary { background: transparent; border: 1px solid var(--color-border); color: #fff; }
+        .btn-secondary:hover { background: var(--bg-secondary); }
         .btn:disabled { background: #333; color: #777; cursor: not-allowed; }
 
         .step-box {
@@ -80,37 +84,69 @@
         }
 
         .timer-text { color: var(--color-primary); font-weight: bold; font-size: 14px; margin-top: 10px; }
+        
+        /* Custom SweetAlert2 Dark Theme overrides */
+        .swal2-popup {
+            background: var(--surface) !important;
+            border: 1px solid var(--color-border) !important;
+            color: #fff !important;
+            border-radius: 16px !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+        .swal2-title { color: #fff !important; }
+        .swal2-html-container { color: var(--color-text-muted) !important; }
+        .swal2-confirm { background: var(--color-primary) !important; color: #000 !important; font-weight: bold !important; border-radius: 10px !important; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <img src="https://i.ibb.co.com/XZJcwxzw/0f94800fa0049e5dad9ebc027bd54e3c.jpg" class="logo" alt="Logo">
-        <h2 id="page-title">VEZC-HYB Key System</h2>
-        <p id="page-desc">Complete the steps to get your 24-hour access key.</p>
+        <h2 id="page-title">VEZC-HYB Key Platform</h2>
+        <p id="page-desc">Secure Key Generator & Management Platform</p>
 
-        <!-- VIEW 1: BUAT HALAMAN GENERATOR (OWNER HUB) -->
-        <div id="creator-view" style="display:none;">
+        <!-- VIEW 1: AUTHENTICATION (LOGIN / REGISTER HUB CREATOR) -->
+        <div id="auth-view" style="display:none;">
+            <div id="auth-mode-title" style="font-size:15px; font-weight:bold; color:var(--color-primary); margin-bottom:15px;">Creator Login Required</div>
             <div class="form-group">
-                <label>Your Hub / Username</label>
-                <input type="text" id="owner-name" class="input-field" placeholder="e.g. Clock">
+                <label>Email Address</label>
+                <input type="email" id="auth-email" class="input-field" placeholder="admin@hub.com">
             </div>
             <div class="form-group">
-                <label>Step 1 Custom Task Link (Optional)</label>
+                <label>Password</label>
+                <input type="password" id="auth-pass" class="input-field" placeholder="••••••••">
+            </div>
+            <button class="btn" id="auth-action-btn" onclick="app.handleAuth()">Login to Hub</button>
+            <button class="btn btn-secondary" style="margin-top:8px;" onclick="app.toggleAuthMode()">Switch to Register</button>
+        </div>
+
+        <!-- VIEW 2: DASHBOARD BUAT HALAMAN GENERATOR -->
+        <div id="creator-dashboard" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:12px; color:var(--color-text-muted);">
+                <span>Logged in as: <strong id="user-email-display" style="color:var(--color-primary);"></strong></span>
+                <button class="btn btn-secondary" style="width:auto; padding:5px 10px; font-size:11px; margin:0;" onclick="app.logout()">Logout</button>
+            </div>
+            <hr style="border-color:var(--color-border); margin-bottom:15px;">
+            <div class="form-group">
+                <label>Your Hub Name / Identifier</label>
+                <input type="text" id="owner-name" class="input-field" placeholder="e.g. ClockHub">
+            </div>
+            <div class="form-group">
+                <label>Step 1 Task Link (Optional)</label>
                 <input type="text" id="task-1" class="input-field" placeholder="Leave empty for 10s visit task">
             </div>
             <div class="form-group">
-                <label>Step 2 Custom Task Link (Optional)</label>
+                <label>Step 2 Task Link (Optional)</label>
                 <input type="text" id="task-2" class="input-field" placeholder="Leave empty for 10s visit task">
             </div>
             <div class="form-group">
-                <label>Step 3 Custom Task Link (Optional)</label>
+                <label>Step 3 Task Link (Optional)</label>
                 <input type="text" id="task-3" class="input-field" placeholder="Leave empty for 10s visit task">
             </div>
-            <button class="btn" onclick="generateCustomLink()">Generate My Hub Link</button>
+            <button class="btn" onclick="app.generateCustomLink()">Generate My Hub Link</button>
         </div>
 
-        <!-- VIEW 2: USER PROSES (STEP 1, 2, 3 & KEY GENERATION) -->
+        <!-- VIEW 3: USER PROSES (STEP 1, 2, 3 & KEY GENERATION) -->
         <div id="user-view" style="display:none;">
             <div id="step-container"></div>
         </div>
@@ -123,7 +159,8 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBkLQc3Lhn9Rnq2NTMezoW0eTfNDyFIFyw",
@@ -135,33 +172,132 @@
         };
 
         const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
         const db = getFirestore(firebaseApp);
 
         window.app = {
+            currentUser: null,
+            isRegisterMode: false,
             owner: "",
             tasks: [],
             currentStep: 1,
 
             init() {
+                onAuthStateChanged(auth, (user) => {
+                    this.currentUser = user;
+                    this.routeCheck();
+                });
+
+                window.addEventListener('hashchange', () => this.routeCheck());
+            },
+
+            routeCheck() {
                 const hash = window.location.hash;
-                if (!hash || !hash.includes("|")) {
-                    document.getElementById('creator-view').style.display = 'block';
+                
+                // Jika membuka URL generator publik (#HubName|Tasks)
+                if (hash && hash.includes("|")) {
+                    document.getElementById('auth-view').style.display = 'none';
+                    document.getElementById('creator-dashboard').style.display = 'none';
+                    document.getElementById('user-view').style.display = 'block';
+                    this.parseUserHash(hash);
                     return;
                 }
 
-                // Format Hash: #OwnerName|Base64EncodedTasks
+                // Jika membuka halaman utama admin/creator
+                document.getElementById('user-view').style.display = 'none';
+                if (this.currentUser) {
+                    document.getElementById('auth-view').style.display = 'none';
+                    document.getElementById('creator-dashboard').style.display = 'block';
+                    document.getElementById('user-email-display').textContent = this.currentUser.email;
+                } else {
+                    document.getElementById('auth-view').style.display = 'block';
+                    document.getElementById('creator-dashboard').style.display = 'none';
+                }
+            },
+
+            toggleAuthMode() {
+                this.isRegisterMode = !this.isRegisterMode;
+                document.getElementById('auth-mode-title').textContent = this.isRegisterMode ? "Register New Creator Account" : "Creator Login Required";
+                document.getElementById('auth-action-btn').textContent = this.isRegisterMode ? "Register Account" : "Login to Hub";
+            },
+
+            async handleAuth() {
+                const email = document.getElementById('auth-email').value.trim();
+                const pass = document.getElementById('auth-pass').value.trim();
+
+                if (!email || !pass) {
+                    Swal.fire('Error', 'Please fill in all fields!', 'error');
+                    return;
+                }
+
+                try {
+                    if (this.isRegisterMode) {
+                        await createUserWithEmailAndPassword(auth, email, pass);
+                        Swal.fire('Success', 'Account created successfully!', 'success');
+                    } else {
+                        await signInWithEmailAndPassword(auth, email, pass);
+                        Toastify({ text: "Logged in successfully!", style: { background: "#eab308", color: "#000" } }).showToast();
+                    }
+                } catch (e) {
+                    Swal.fire('Authentication Error', e.message, 'error');
+                }
+            },
+
+            async logout() {
+                await signOut(auth);
+                Toastify({ text: "Logged out", duration: 2000 }).showToast();
+            },
+
+            async generateCustomLink() {
+                const name = document.getElementById('owner-name').value.trim();
+                if (!name) {
+                    Swal.fire('Error', 'Please enter your hub name!', 'error');
+                    return;
+                }
+
+                const t1 = document.getElementById('task-1').value.trim();
+                const t2 = document.getElementById('task-2').value.trim();
+                const t3 = document.getElementById('task-3').value.trim();
+
+                const tasksArray = [t1, t2, t3];
+                const encodedTasks = btoa(JSON.stringify(tasksArray));
+                const hubId = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+                // Simpan kepemilikan hub ke Firestore agar hanya akun ini yang bisa mengedit/menghapusnya
+                try {
+                    await setDoc(doc(db, "hub_configs", hubId), {
+                        ownerName: name,
+                        creatorUid: this.currentUser.uid,
+                        tasks: tasksArray,
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    const finalUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(name)}|${encodedTasks}`;
+                    
+                    Swal.fire({
+                        title: 'Hub Link Created!',
+                        html: `<input type="text" class="input-field" value="${finalUrl}" readonly style="text-align:center; margin-top:10px;" id="gen-link">`,
+                        confirmButtonText: 'Copy Link',
+                    }).then(() => {
+                        navigator.clipboard.writeText(finalUrl);
+                        Toastify({ text: "Link copied to clipboard!", style: { background: "#eab308", color: "#000" } }).showToast();
+                    });
+                } catch (e) {
+                    Swal.fire('Error', 'Failed to save configuration to server.', 'error');
+                }
+            },
+
+            parseUserHash(hash) {
                 try {
                     const cleanHash = hash.replace("#", "");
                     const parts = cleanHash.split("|");
                     this.owner = decodeURIComponent(parts[0]);
-                    const decodedTasks = JSON.parse(atob(parts[1]));
-                    this.tasks = decodedTasks;
+                    this.tasks = JSON.parse(atob(parts[1]));
 
-                    document.getElementById('user-view').style.display = 'block';
                     document.getElementById('page-title').textContent = `${this.owner}'s Key System`;
                     this.renderStep();
                 } catch (e) {
-                    document.getElementById('creator-view').style.display = 'block';
+                    Swal.fire('Error', 'Invalid or corrupted generator link!', 'error');
                 }
             },
 
@@ -170,12 +306,11 @@
                 const lastKeyDate = localStorage.getItem("vezc_key_date_" + this.owner);
                 const today = new Date().toDateString();
 
-                // Cek limit 1 key per hari per IP/Browser
                 if (lastKeyDate === today) {
                     container.innerHTML = `
                         <div class="step-box" style="text-align:center;">
                             <h3 style="color:var(--color-success); margin-bottom:10px;">Already Generated Today!</h3>
-                            <p>You have already generated a key for this hub today. Please come back tomorrow.</p>
+                            <p>You have already generated a key for this hub today. Come back tomorrow.</p>
                         </div>
                     `;
                     return;
@@ -196,7 +331,6 @@
                         </div>
                     `;
                 } else {
-                    // Semua step selesai -> Generate Key & Simpan ke Firebase
                     this.executeFinalGeneration();
                 }
             },
@@ -206,49 +340,27 @@
                 const timerBox = document.getElementById('timer-box');
                 const countdown = document.getElementById('countdown');
 
-                if (!url || url.trim() === "") {
-                    // Task Default: Buka tab baru / simulasi visit 10 detik
-                    window.open("https://www.google.com", "_blank");
-                    btn.disabled = true;
-                    timerBox.style.display = 'block';
-                    let timeLeft = 10;
+                const targetUrl = (!url || url.trim() === "") ? "https://www.google.com" : url;
+                window.open(targetUrl, "_blank");
 
-                    let interval = setInterval(() => {
-                        timeLeft--;
-                        countdown.textContent = timeLeft;
-                        if (timeLeft <= 0) {
-                            clearInterval(interval);
-                            btn.disabled = false;
-                            timerBox.style.display = 'none';
-                            btn.textContent = "Continue to Next Step";
-                            btn.onclick = () => {
-                                window.app.currentStep++;
-                                window.app.renderStep();
-                            };
-                        }
-                    }, 1000);
-                } else {
-                    // Task Custom dari Creator
-                    window.open(url, "_blank");
-                    btn.disabled = true;
-                    timerBox.style.display = 'block';
-                    let timeLeft = 5;
+                btn.disabled = true;
+                timerBox.style.display = 'block';
+                let timeLeft = (!url || url.trim() === "") ? 10 : 5;
 
-                    let interval = setInterval(() => {
-                        timeLeft--;
-                        countdown.textContent = timeLeft;
-                        if (timeLeft <= 0) {
-                            clearInterval(interval);
-                            btn.disabled = false;
-                            timerBox.style.display = 'none';
-                            btn.textContent = "Continue to Next Step";
-                            btn.onclick = () => {
-                                window.app.currentStep++;
-                                window.app.renderStep();
-                            };
-                        }
-                    }, 1000);
-                }
+                let interval = setInterval(() => {
+                    timeLeft--;
+                    countdown.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        btn.disabled = false;
+                        timerBox.style.display = 'none';
+                        btn.textContent = "Continue to Next Step";
+                        btn.onclick = () => {
+                            window.app.currentStep++;
+                            window.app.renderStep();
+                        };
+                    }
+                }, 1000);
             },
 
             async executeFinalGeneration() {
@@ -270,7 +382,6 @@
                         created: new Date().toISOString()
                     });
 
-                    // Set batasan 1 key per hari di browser
                     localStorage.setItem("vezc_key_date_" + this.owner, new Date().toDateString());
 
                     container.innerHTML = `
@@ -278,41 +389,14 @@
                             <h3 style="color:var(--color-success); margin-bottom:10px;">Key Generated Successfully!</h3>
                             <p style="margin-bottom:15px;">Your 24-hour access key:</p>
                             <div style="background:#000; padding:12px; border-radius:8px; font-family:monospace; color:var(--color-primary); font-size:15px; margin-bottom:15px; word-break:break-all;">${newKey}</div>
-                            <button class="btn btn-success" onclick="navigator.clipboard.writeText('${newKey}'); alert('Key copied!');">Copy Key</button>
+                            <button class="btn btn-success" onclick="navigator.clipboard.writeText('${newKey}'); Swal.fire('Copied!', 'Key copied to clipboard', 'success');">Copy Key</button>
                         </div>
                     `;
                 } catch (e) {
-                    console.error(e);
-                    Toastify({ text: "Failed to save key to server!", style: { background: "#ef4444" } }).showToast();
+                    Swal.fire('Error', 'Failed to save key to server!', 'error');
                 }
             }
         };
-
-        window.generateCustomLink = function() {
-            const name = document.getElementById('owner-name').value.trim();
-            if (!name) {
-                Swal.fire('Error', 'Please enter your hub name!', 'error');
-                return;
-            }
-
-            const t1 = document.getElementById('task-1').value.trim();
-            const t2 = document.getElementById('task-2').value.trim();
-            const t3 = document.getElementById('task-3').value.trim();
-
-            const tasksArray = [t1, t2, t3];
-            const encodedTasks = btoa(JSON.stringify(tasksArray));
-
-            const finalUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(name)}|${encodedTasks}`;
-            
-            Swal.fire({
-                title: 'Your Generator Link Ready!',
-                html: `<input type="text" class="input-field" value="${finalUrl}" readonly style="text-align:center; margin-top:10px;" id="gen-link">`,
-                confirmButtonText: 'Copy Link',
-            }).then(() => {
-                navigator.clipboard.writeText(finalUrl);
-                Toastify({ text: "Link copied to clipboard!", style: { background: "#eab308", color: "#000" } }).showToast();
-            });
-        }
 
         window.app.init();
     </script>
