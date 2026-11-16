@@ -140,7 +140,7 @@
                 <label>Step 3 Task Link (Optional)</label>
                 <input type="text" id="task-3" class="input-field" placeholder="https://... (Leave empty for 10s visit)">
             </div>
-            <button class="btn" onclick="app.generateCustomLink()">Generate My Hub Link</button>
+            <button class="btn" onclick="app.generateCustomLink()">Generate My Hub Link & Script</button>
         </div>
 
         <div id="user-view" style="display:none;">
@@ -272,13 +272,216 @@
 
                     const finalUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(name)}|${encodedTasks}`;
                     
+                    // Generate Script Lua Otomatis dengan nama Hub mereka & terhubung ke key-server-af0df
+                    const luaScript = `local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+local HUB_NAME = "${name}"
+
+if CoreGui:FindFirstChild(HUB_NAME .. "KeySystemUI") then
+    CoreGui[HUB_NAME .. "KeySystemUI"]:Destroy()
+end
+
+local Blur = Instance.new("BlurEffect")
+Blur.Name = HUB_NAME .. "UIBlur"
+Blur.Size = 16
+Blur.Parent = Lighting
+
+local FOLDER_NAME = "${name}"
+local KEY_FILE_NAME = FOLDER_NAME .. "/Save-Key.json"
+local EXPIRATION_TIME = 24 * 60 * 60
+
+local SUPPORTED_GAMES = {
+    [115681808123944] = "https://pastebin.com/raw/vucJdipJ",
+}
+
+local currentPlaceId = game.PlaceId
+local isGameSupported = SUPPORTED_GAMES[currentPlaceId] ~= nil
+
+local function loadMainScript()
+    local scriptUrl = SUPPORTED_GAMES[currentPlaceId]
+    if scriptUrl then
+        loadstring(game:HttpGet(scriptUrl))()
+    else
+        warn("[" .. HUB_NAME .. "] Game not supported! Place ID: " .. tostring(currentPlaceId))
+    end
+end
+
+local function ensureFolderExists()
+    if makefolder and isfolder and not isfolder(FOLDER_NAME) then
+        pcall(function() makefolder(FOLDER_NAME) end)
+    end
+end
+
+-- Validasi Key Online ke Firebase key-server-af0df
+local function verifyKeyOnline(inputKey)
+    local url = "https://firestore.googleapis.com/v1/projects/key-server-af0df/databases/(default)/documents/keys/" .. inputKey
+    local success, response = pcall(function()
+        return HttpService:GetAsync(url)
+    end)
+    if success and response then
+        local data = HttpService:JSONDecode(response)
+        if data and data.fields and data.fields.expiryTime then
+            local expiryTime = tonumber(data.fields.expiryTime.integerValue)
+            if expiryTime and os.time() < expiryTime then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function isKeyValidLocally()
+    if not (writefile and readfile and isfile) then return false end
+    local success, isFileExist = pcall(function() return isfile(KEY_FILE_NAME) end)
+    if success and isFileExist then
+        local readSuccess, content = pcall(function() return readfile(KEY_FILE_NAME) end)
+        if readSuccess and content then
+            local jsonSuccess, data = pcall(function() return HttpService:JSONDecode(content) end)
+            if jsonSuccess and data and data.Key and verifyKeyOnline(data.Key) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function saveKeySession(inputKey)
+    ensureFolderExists()
+    if writefile then
+        pcall(function()
+            local data = HttpService:JSONEncode({Key = inputKey})
+            writefile(KEY_FILE_NAME, data)
+        end)
+    end
+end
+
+if isKeyValidLocally() then
+    if Blur and Blur.Parent then Blur:Destroy() end
+    loadMainScript()
+    return
+end
+
+-- UI Construction
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = HUB_NAME .. "KeySystemUI"
+if not pcall(function() ScreenGui.Parent = CoreGui end) then
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.IgnoreGuiInset = true
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 360, 0, 260)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(24, 28, 38)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 20)
+Title.BackgroundTransparency = 1
+Title.Text = HUB_NAME .. " — KEY SYSTEM"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local KeyInput = Instance.new("TextBox")
+KeyInput.Size = UDim2.new(1, -40, 0, 40)
+KeyInput.Position = UDim2.new(0, 20, 0, 70)
+KeyInput.BackgroundColor3 = Color3.fromRGB(16, 19, 26)
+KeyInput.PlaceholderText = "Enter your key here..."
+KeyInput.PlaceholderColor3 = Color3.fromRGB(120, 130, 150)
+KeyInput.Text = ""
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.TextSize = 12
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.Parent = MainFrame
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 8)
+InputCorner.Parent = KeyInput
+
+local VerifyBtn = Instance.new("TextButton")
+VerifyBtn.Size = UDim2.new(1, -40, 0, 40)
+VerifyBtn.Position = UDim2.new(0, 20, 0, 130)
+VerifyBtn.BackgroundColor3 = Color3.fromRGB(3, 95, 3)
+VerifyBtn.Text = "VERIFY KEY"
+VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+VerifyBtn.TextSize = 13
+VerifyBtn.Font = Enum.Font.GothamBold
+VerifyBtn.Parent = MainFrame
+
+local VerifyCorner = Instance.new("UICorner")
+VerifyCorner.CornerRadius = UDim.new(0, 8)
+VerifyCorner.Parent = VerifyBtn
+
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Size = UDim2.new(1, -40, 0, 35)
+GetKeyBtn.Position = UDim2.new(0, 20, 0, 180)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(45, 52, 70)
+GetKeyBtn.Text = "GET KEY LINK"
+GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyBtn.TextSize = 11
+GetKeyBtn.Font = Enum.Font.GothamBold
+GetKeyBtn.Parent = MainFrame
+
+local GetKeyCorner = Instance.new("UICorner")
+GetKeyCorner.CornerRadius = UDim.new(0, 8)
+GetKeyCorner.Parent = GetKeyBtn
+
+GetKeyBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard("${finalUrl}")
+        GetKeyBtn.Text = "LINK COPIED!"
+        task.wait(1.5)
+        GetKeyBtn.Text = "GET KEY LINK"
+    end
+end)
+
+VerifyBtn.MouseButton1Click:Connect(function()
+    local inputKey = KeyInput.Text
+    if inputKey == "" then return end
+    
+    VerifyBtn.Text = "CHECKING..."
+    if verifyKeyOnline(inputKey) then
+        VerifyBtn.Text = "SUCCESS!"
+        saveKeySession(inputKey)
+        task.wait(1)
+        if Lighting:FindFirstChild(HUB_NAME .. "UIBlur") then Lighting[HUB_NAME .. "UIBlur"]:Destroy() end
+        ScreenGui:Destroy()
+        loadMainScript()
+    else
+        VerifyBtn.Text = "INVALID KEY!"
+        task.wait(1.5)
+        VerifyBtn.Text = "VERIFY KEY"
+    end
+end)`;
+
                     Swal.fire({
-                        title: 'Hub Link Created!',
-                        html: `<input type="text" class="input-field" value="${finalUrl}" readonly style="text-align:center; margin-top:10px;" id="gen-link">`,
-                        confirmButtonText: 'Copy Link',
-                    }).then(() => {
-                        navigator.clipboard.writeText(finalUrl);
-                        Toastify({ text: "Link copied to clipboard!", style: { background: "#eab308", color: "#000" } }).showToast();
+                        title: 'Hub & Script Created!',
+                        html: `
+                            <p style="margin-bottom:10px; font-size:12px;">Generator Link:</p>
+                            <input type="text" class="input-field" value="${finalUrl}" readonly style="text-align:center; margin-bottom:15px;" id="gen-link">
+                            <button class="btn btn-success" onclick="navigator.clipboard.writeText(` + "`" + `${luaScript}` + "`" + `); Swal.fire('Success', 'Lua Script copied to clipboard!', 'success');">Copy Roblox Lua Script</button>
+                        `,
+                        confirmButtonText: 'Copy Link Only',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigator.clipboard.writeText(finalUrl);
+                            Toastify({ text: "Link copied to clipboard!", style: { background: "#eab308", color: "#000" } }).showToast();
+                        }
                     });
                 } catch (e) {
                     Swal.fire('Error', 'Failed to save configuration to server.', 'error');
