@@ -33,24 +33,23 @@
         const db = getFirestore(firebaseApp);
 
         async function initRedirect() {
-            // 1. Buat token unik server-side simulation
+            // 1. Buat token unik server-side
             const newToken = 'TOKEN-' + Math.random().toString(36).substring(2) + Date.now();
             
-            // 2. Simpan ke database 'sessions' dengan waktu pembuatan (timestamp)
+            // 2. Simpan ke database Firestore
             await setDoc(doc(db, "sessions", newToken), {
                 createdAt: Date.now(),
                 used: false
             });
 
-            // 3. Tentukan URL halaman utama web-mu untuk tempat kembali setelah Linkvertise selesai
-            // Contoh: https://clockzoos.github.io/generate/?token=TOKEN-xxxx
-            const mainAppUrl = window.location.origin + "/generate/"; // Sesuaikan path foldermu
+            // 3. URL kembali ke halaman utama setelah Linkvertise selesai
+            const mainAppUrl = window.location.origin + "/generate/"; // Sesuaikan dengan folder utama webmu
             const targetReturnUrl = encodeURIComponent(mainAppUrl + "?token=" + newToken);
 
-            // 4. Link Linkvertise-mu
-            const baseLinkvertise = "https://link-hub.net/7791978/7v5R3sGQl4S1";
+            // 4. Link Linkvertise barumu
+            const baseLinkvertise = "https://link-center.net/7791978/sc6bHGbGaTIW";
 
-            // 5. Lempar user ke Linkvertise dengan membawa parameter ?r= return URL
+            // 5. Lempar user ke Linkvertise
             window.location.href = baseLinkvertise + "?r=" + targetReturnUrl;
         }
 
