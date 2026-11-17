@@ -3,158 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VEZC-HYB Key System Platform</title>
+    <title>VEZC-HYB Private Key System</title>
     <link rel="icon" type="image/jpeg" href="https://i.ibb.co.com/XZJcwxzw/0f94800fa0049e5dad9ebc027bd54e3c.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --bg-primary: #000000;
-            --bg-secondary: #0a0a0a;
             --surface: #050505;
             --color-primary: #eab308;
             --color-primary-hover: #ca8a04;
-            --color-primary-dim: rgba(234, 179, 8, 0.1);
             --color-border: #1a1a1a;
             --color-text: #ffffff;
             --color-text-muted: #a0a0a0;
             --color-success: #22c55e;
-            --color-danger: #ef4444;
         }
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            background: var(--bg-primary);
-            color: var(--color-text);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            background: var(--bg-primary); color: var(--color-text);
+            font-family: 'Inter', sans-serif; display: flex;
+            justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
         }
-
         .card {
-            background: var(--surface);
-            border: 1px solid var(--color-border);
-            border-radius: 20px;
-            padding: 36px;
-            width: 100%;
-            max-width: 480px;
-            text-align: center;
+            background: var(--surface); border: 1px solid var(--color-border);
+            border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; text-align: center;
             box-shadow: 0 15px 35px rgba(0,0,0,0.9);
         }
-
-        .logo {
-            width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
-            margin: 0 auto 16px; border: 2px solid var(--color-primary);
-            box-shadow: 0 0 15px var(--color-primary-dim);
-        }
-
-        h2 { font-size: 22px; margin-bottom: 8px; color: #fff; font-weight: 700; }
+        .logo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; border: 2px solid var(--color-primary); }
+        h2 { font-size: 20px; margin-bottom: 8px; color: #fff; }
         p { font-size: 13px; color: var(--color-text-muted); margin-bottom: 24px; }
-
-        .form-group { margin-bottom: 16px; text-align: left; }
-        label { font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; display: block; margin-bottom: 6px; }
-        
-        .input-field {
-            width: 100%; padding: 12px 16px; background: var(--bg-secondary);
-            border: 1px solid var(--color-border); color: #fff; border-radius: 12px; font-size: 14px;
-        }
-        .input-field:focus { border-color: var(--color-primary); outline: none; }
-
         .btn {
             background: var(--color-primary); color: #000; border: none;
             padding: 13px 20px; border-radius: 12px; font-weight: 700; cursor: pointer;
-            width: 100%; font-size: 14px; transition: 0.2s; margin-top: 10px;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            text-decoration: none;
+            width: 100%; font-size: 14px; transition: 0.2s; text-decoration: none; display: inline-block;
         }
         .btn:hover { background: var(--color-primary-hover); }
         .btn-success { background: var(--color-success); color: #fff; }
-        .btn-secondary { background: transparent; border: 1px solid var(--color-border); color: #fff; }
-        .btn-secondary:hover { background: var(--bg-secondary); }
-        .btn:disabled { background: #333; color: #777; cursor: not-allowed; }
-
-        .step-box {
-            background: var(--bg-secondary); border: 1px solid var(--color-border);
-            padding: 20px; border-radius: 14px; margin-bottom: 20px; text-align: left;
+        .key-box {
+            background: #0a0a0a; border: 1px dashed var(--color-primary);
+            padding: 14px; border-radius: 10px; font-family: monospace; font-size: 14px;
+            color: var(--color-primary); word-break: break-all; margin-top: 15px; display: none;
         }
-
-        .timer-text { color: var(--color-primary); font-weight: bold; font-size: 14px; margin-top: 10px; }
-        
-        .swal2-popup {
-            background: var(--surface) !important;
-            border: 1px solid var(--color-border) !important;
-            color: #fff !important;
-            border-radius: 16px !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-        .swal2-title { color: #fff !important; }
-        .swal2-html-container { color: var(--color-text-muted) !important; }
-        .swal2-confirm { background: var(--color-primary) !important; color: #000 !important; font-weight: bold !important; border-radius: 10px !important; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <img src="https://i.ibb.co.com/XZJcwxzw/0f94800fa0049e5dad9ebc027bd54e3c.jpg" class="logo" alt="Logo">
-        <h2 id="page-title">VEZC-HYB Key Platform</h2>
-        <p id="page-desc">Secure Key Generator & Management Platform</p>
+        <h2>VEZC-HYB Key System</h2>
+        <p>Complete the Linkvertise target to generate your 24-hour access key.</p>
 
-        <div id="auth-view" style="display:none;">
-            <div id="auth-mode-title" style="font-size:15px; font-weight:bold; color:var(--color-primary); margin-bottom:15px;">Creator Login Required</div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="auth-email" class="input-field" placeholder="admin@hub.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="auth-pass" class="input-field" placeholder="••••••••">
-            </div>
-            <button class="btn" id="auth-action-btn" onclick="app.handleAuth()">Login to Hub</button>
-            <button class="btn btn-secondary" style="margin-top:8px;" onclick="app.toggleAuthMode()">Switch to Register</button>
+        <div id="step-start">
+            <a href="#" id="linkvertise-btn" class="btn">Proceed to Linkvertise</a>
         </div>
 
-        <div id="creator-dashboard" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:12px; color:var(--color-text-muted);">
-                <span>Logged in as: <strong id="user-email-display" style="color:var(--color-primary);"></strong></span>
-                <button class="btn btn-secondary" style="width:auto; padding:5px 10px; font-size:11px; margin:0;" onclick="app.logout()">Logout</button>
-            </div>
-            <hr style="border-color:var(--color-border); margin-bottom:15px;">
-            <div class="form-group">
-                <label>Your Hub Name / Identifier</label>
-                <input type="text" id="owner-name" class="input-field" placeholder="e.g. ClockHub">
-            </div>
-            <div class="form-group">
-                <label>Step 1 Task Link (Optional)</label>
-                <input type="text" id="task-1" class="input-field" placeholder="https://... (Leave empty for 10s visit)">
-            </div>
-            <div class="form-group">
-                <label>Step 2 Task Link (Optional)</label>
-                <input type="text" id="task-2" class="input-field" placeholder="https://... (Leave empty for 10s visit)">
-            </div>
-            <div class="form-group">
-                <label>Step 3 Task Link (Optional)</label>
-                <input type="text" id="task-3" class="input-field" placeholder="https://... (Leave empty for 10s visit)">
-            </div>
-            <button class="btn" onclick="app.generateCustomLink()">Generate My Hub Link & Script</button>
+        <div id="step-claim" style="display:none;">
+            <button class="btn btn-success" onclick="verifyAndClaimKey()">Claim My Key</button>
         </div>
 
-        <div id="user-view" style="display:none;">
-            <div id="step-container"></div>
+        <div id="key-display-container" class="key-box">
+            <div id="final-key-text" style="margin-bottom: 8px; font-weight: bold;"></div>
+            <button class="btn btn-success" style="padding: 8px; font-size: 12px;" onclick="copyKey()">Copy Key</button>
         </div>
     </div>
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBkLQc3Lhn9Rnq2NTMezoW0eTfNDyFIFyw",
@@ -166,440 +82,99 @@
         };
 
         const firebaseApp = initializeApp(firebaseConfig);
-        const auth = getAuth(firebaseApp);
         const db = getFirestore(firebaseApp);
 
-        window.app = {
-            currentUser: null,
-            isRegisterMode: false,
-            owner: "",
-            tasks: [],
-            currentStep: 1,
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
 
-            init() {
-                onAuthStateChanged(auth, (user) => {
-                    this.currentUser = user;
-                    this.routeCheck();
+            const lvBtn = document.getElementById('linkvertise-btn');
+            // Linkvertise tujuanmu dengan parameter ?r= untuk redirect balik membawa token
+            const baseLinkvertise = "https://link-hub.net/7791978/7v5R3sGQl4S1";
+
+            if (token) {
+                // Jika user kembali dari Linkvertise membawa token, tampilkan tombol Claim Key
+                document.getElementById('step-start').style.display = 'none';
+                document.getElementById('step-claim').style.display = 'block';
+                window.currentSessionToken = token;
+            } else {
+                // Jika baru pertama buka web, buat token baru
+                const newToken = 'TOKEN-' + Math.random().toString(36).substring(2) + Date.now();
+                window.currentSessionToken = newToken;
+                
+                const targetReturnUrl = encodeURIComponent(window.location.origin + window.location.pathname + "?token=" + newToken);
+                lvBtn.href = baseLinkvertise + "?r=" + targetReference(targetReturnUrl);
+
+                await setDoc(doc(db, "sessions", newToken), {
+                    createdAt: Date.now(),
+                    used: false
                 });
-                window.addEventListener('hashchange', () => this.routeCheck());
-            },
+            }
+        });
 
-            routeCheck() {
-                const hash = window.location.hash;
-                if (hash && hash.includes("|")) {
-                    document.getElementById('auth-view').style.display = 'none';
-                    document.getElementById('creator-dashboard').style.display = 'none';
-                    document.getElementById('user-view').style.display = 'block';
-                    this.parseUserHash(hash);
-                    return;
-                }
+        function targetReference(returnUrl) {
+            return returnUrl;
+        }
 
-                document.getElementById('user-view').style.display = 'none';
-                if (this.currentUser) {
-                    document.getElementById('auth-view').style.display = 'none';
-                    document.getElementById('creator-dashboard').style.display = 'block';
-                    document.getElementById('user-email-display').textContent = this.currentUser.email;
-                } else {
-                    document.getElementById('auth-view').style.display = 'block';
-                    document.getElementById('creator-dashboard').style.display = 'none';
-                }
-            },
+        window.verifyAndClaimKey = async function() {
+            const token = window.currentSessionToken;
+            if (!token) {
+                Swal.fire('Error', 'Invalid session!', 'error');
+                return;
+            }
 
-            toggleAuthMode() {
-                this.isRegisterMode = !this.isRegisterMode;
-                document.getElementById('auth-mode-title').textContent = this.isRegisterMode ? "Register New Creator Account" : "Creator Login Required";
-                document.getElementById('auth-action-btn').textContent = this.isRegisterMode ? "Register Account" : "Login to Hub";
-            },
+            const sessionRef = doc(db, "sessions", token);
+            const sessionSnap = await getDoc(sessionRef);
 
-            async handleAuth() {
-                const email = document.getElementById('auth-email').value.trim();
-                const pass = document.getElementById('auth-pass').value.trim();
+            if (!sessionSnap.exists()) {
+                Swal.fire('Anti-Bypass Triggered!', 'Invalid session token or bypass detected!', 'error');
+                return;
+            }
 
-                if (!email || !pass) {
-                    Swal.fire('Error', 'Please fill in all fields!', 'error');
-                    return;
-                }
+            const sessionData = sessionSnap.data();
+            const timeElapsed = (Date.now() - sessionData.createdAt) / 1000;
 
-                try {
-                    if (this.isRegisterMode) {
-                        await createUserWithEmailAndPassword(auth, email, pass);
-                        Swal.fire('Success', 'Account created successfully!', 'success');
-                    } else {
-                        await signInWithEmailAndPassword(auth, email, pass);
-                        Toastify({ text: "Logged in successfully!", style: { background: "#eab308", color: "#000" } }).showToast();
-                    }
-                } catch (e) {
-                    Swal.fire('Authentication Error', e.message, 'error');
-                }
-            },
+            // Cek apakah waktu kembali kurang dari 7 detik (indikasi bypass cepat)
+            if (timeElapsed < 7) {
+                Swal.fire('Bypass Detected!', 'You completed the steps too fast! Please do it legitimately.', 'error');
+                return;
+            }
 
-            async logout() {
-                await signOut(auth);
-                Toastify({ text: "Logged out", duration: 2000 }).showToast();
-            },
+            if (sessionData.used) {
+                Swal.fire('Error', 'This session token has already been used!', 'error');
+                return;
+            }
 
-            formatUrl(url) {
-                if (!url || url.trim() === "") return "";
-                url = url.trim();
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    return "https://" + url;
-                }
-                return url;
-            },
+            const r1 = Math.floor(1000 + Math.random() * 9000);
+            const r2 = Math.floor(1000 + Math.random() * 9000);
+            const newKey = `VEZC-${r1}-${r2}`;
+            const expiryTime = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
 
-            async generateCustomLink() {
-                const name = document.getElementById('owner-name').value.trim();
-                if (!name) {
-                    Swal.fire('Error', 'Please enter your hub name!', 'error');
-                    return;
-                }
+            try {
+                await setDoc(doc(db, "keys", newKey), {
+                    key: newKey,
+                    expiryTime: expiryTime,
+                    used: false,
+                    created: new Date().toISOString()
+                });
 
-                const t1 = this.formatUrl(document.getElementById('task-1').value);
-                const t2 = this.formatUrl(document.getElementById('task-2').value);
-                const t3 = this.formatUrl(document.getElementById('task-3').value);
+                await setDoc(sessionRef, { used: true }, { merge: true });
 
-                const tasksArray = [t1, t2, t3];
-                const encodedTasks = btoa(JSON.stringify(tasksArray));
-                const hubId = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                document.getElementById('step-claim').style.display = 'none';
+                document.getElementById('final-key-text').textContent = newKey;
+                document.getElementById('key-display-container').style.display = 'block';
 
-                try {
-                    await setDoc(doc(db, "hub_configs", hubId), {
-                        ownerName: name,
-                        creatorUid: this.currentUser.uid,
-                        tasks: tasksArray,
-                        updatedAt: new Date().toISOString()
-                    });
-
-                    const finalUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(name)}|${encodedTasks}`;
-                    
-                    // Generate Script Lua Otomatis dengan nama Hub mereka & terhubung ke key-server-af0df
-                    const luaScript = `local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
-local HttpService = game:GetService("HttpService")
-
-local LocalPlayer = Players.LocalPlayer
-local HUB_NAME = "${name}"
-
-if CoreGui:FindFirstChild(HUB_NAME .. "KeySystemUI") then
-    CoreGui[HUB_NAME .. "KeySystemUI"]:Destroy()
-end
-
-local Blur = Instance.new("BlurEffect")
-Blur.Name = HUB_NAME .. "UIBlur"
-Blur.Size = 16
-Blur.Parent = Lighting
-
-local FOLDER_NAME = "${name}"
-local KEY_FILE_NAME = FOLDER_NAME .. "/Save-Key.json"
-local EXPIRATION_TIME = 24 * 60 * 60
-
-local SUPPORTED_GAMES = {
-    [115681808123944] = "https://pastebin.com/raw/vucJdipJ",
-}
-
-local currentPlaceId = game.PlaceId
-local isGameSupported = SUPPORTED_GAMES[currentPlaceId] ~= nil
-
-local function loadMainScript()
-    local scriptUrl = SUPPORTED_GAMES[currentPlaceId]
-    if scriptUrl then
-        loadstring(game:HttpGet(scriptUrl))()
-    else
-        warn("[" .. HUB_NAME .. "] Game not supported! Place ID: " .. tostring(currentPlaceId))
-    end
-end
-
-local function ensureFolderExists()
-    if makefolder and isfolder and not isfolder(FOLDER_NAME) then
-        pcall(function() makefolder(FOLDER_NAME) end)
-    end
-end
-
--- Validasi Key Online ke Firebase key-server-af0df
-local function verifyKeyOnline(inputKey)
-    local url = "https://firestore.googleapis.com/v1/projects/key-server-af0df/databases/(default)/documents/keys/" .. inputKey
-    local success, response = pcall(function()
-        return HttpService:GetAsync(url)
-    end)
-    if success and response then
-        local data = HttpService:JSONDecode(response)
-        if data and data.fields and data.fields.expiryTime then
-            local expiryTime = tonumber(data.fields.expiryTime.integerValue)
-            if expiryTime and os.time() < expiryTime then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-local function isKeyValidLocally()
-    if not (writefile and readfile and isfile) then return false end
-    local success, isFileExist = pcall(function() return isfile(KEY_FILE_NAME) end)
-    if success and isFileExist then
-        local readSuccess, content = pcall(function() return readfile(KEY_FILE_NAME) end)
-        if readSuccess and content then
-            local jsonSuccess, data = pcall(function() return HttpService:JSONDecode(content) end)
-            if jsonSuccess and data and data.Key and verifyKeyOnline(data.Key) then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-local function saveKeySession(inputKey)
-    ensureFolderExists()
-    if writefile then
-        pcall(function()
-            local data = HttpService:JSONEncode({Key = inputKey})
-            writefile(KEY_FILE_NAME, data)
-        end)
-    end
-end
-
-if isKeyValidLocally() then
-    if Blur and Blur.Parent then Blur:Destroy() end
-    loadMainScript()
-    return
-end
-
--- UI Construction
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = HUB_NAME .. "KeySystemUI"
-if not pcall(function() ScreenGui.Parent = CoreGui end) then
-    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-end
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.IgnoreGuiInset = true
-
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 360, 0, 260)
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(24, 28, 38)
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
-
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 12)
-MainCorner.Parent = MainFrame
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Position = UDim2.new(0, 0, 0, 20)
-Title.BackgroundTransparency = 1
-Title.Text = HUB_NAME .. " — KEY SYSTEM"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 16
-Title.Font = Enum.Font.GothamBold
-Title.Parent = MainFrame
-
-local KeyInput = Instance.new("TextBox")
-KeyInput.Size = UDim2.new(1, -40, 0, 40)
-KeyInput.Position = UDim2.new(0, 20, 0, 70)
-KeyInput.BackgroundColor3 = Color3.fromRGB(16, 19, 26)
-KeyInput.PlaceholderText = "Enter your key here..."
-KeyInput.PlaceholderColor3 = Color3.fromRGB(120, 130, 150)
-KeyInput.Text = ""
-KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyInput.TextSize = 12
-KeyInput.Font = Enum.Font.Gotham
-KeyInput.Parent = MainFrame
-
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 8)
-InputCorner.Parent = KeyInput
-
-local VerifyBtn = Instance.new("TextButton")
-VerifyBtn.Size = UDim2.new(1, -40, 0, 40)
-VerifyBtn.Position = UDim2.new(0, 20, 0, 130)
-VerifyBtn.BackgroundColor3 = Color3.fromRGB(3, 95, 3)
-VerifyBtn.Text = "VERIFY KEY"
-VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-VerifyBtn.TextSize = 13
-VerifyBtn.Font = Enum.Font.GothamBold
-VerifyBtn.Parent = MainFrame
-
-local VerifyCorner = Instance.new("UICorner")
-VerifyCorner.CornerRadius = UDim.new(0, 8)
-VerifyCorner.Parent = VerifyBtn
-
-local GetKeyBtn = Instance.new("TextButton")
-GetKeyBtn.Size = UDim2.new(1, -40, 0, 35)
-GetKeyBtn.Position = UDim2.new(0, 20, 0, 180)
-GetKeyBtn.BackgroundColor3 = Color3.fromRGB(45, 52, 70)
-GetKeyBtn.Text = "GET KEY LINK"
-GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-GetKeyBtn.TextSize = 11
-GetKeyBtn.Font = Enum.Font.GothamBold
-GetKeyBtn.Parent = MainFrame
-
-local GetKeyCorner = Instance.new("UICorner")
-GetKeyCorner.CornerRadius = UDim.new(0, 8)
-GetKeyCorner.Parent = GetKeyBtn
-
-GetKeyBtn.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard("${finalUrl}")
-        GetKeyBtn.Text = "LINK COPIED!"
-        task.wait(1.5)
-        GetKeyBtn.Text = "GET KEY LINK"
-    end
-end)
-
-VerifyBtn.MouseButton1Click:Connect(function()
-    local inputKey = KeyInput.Text
-    if inputKey == "" then return end
-    
-    VerifyBtn.Text = "CHECKING..."
-    if verifyKeyOnline(inputKey) then
-        VerifyBtn.Text = "SUCCESS!"
-        saveKeySession(inputKey)
-        task.wait(1)
-        if Lighting:FindFirstChild(HUB_NAME .. "UIBlur") then Lighting[HUB_NAME .. "UIBlur"]:Destroy() end
-        ScreenGui:Destroy()
-        loadMainScript()
-    else
-        VerifyBtn.Text = "INVALID KEY!"
-        task.wait(1.5)
-        VerifyBtn.Text = "VERIFY KEY"
-    end
-end)`;
-
-                    Swal.fire({
-                        title: 'Hub & Script Created!',
-                        html: `
-                            <p style="margin-bottom:10px; font-size:12px;">Generator Link:</p>
-                            <input type="text" class="input-field" value="${finalUrl}" readonly style="text-align:center; margin-bottom:15px;" id="gen-link">
-                            <button class="btn btn-success" onclick="navigator.clipboard.writeText(` + "`" + `${luaScript}` + "`" + `); Swal.fire('Success', 'Lua Script copied to clipboard!', 'success');">Copy Roblox Lua Script</button>
-                        `,
-                        confirmButtonText: 'Copy Link Only',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            navigator.clipboard.writeText(finalUrl);
-                            Toastify({ text: "Link copied to clipboard!", style: { background: "#eab308", color: "#000" } }).showToast();
-                        }
-                    });
-                } catch (e) {
-                    Swal.fire('Error', 'Failed to save configuration to server.', 'error');
-                }
-            },
-
-            parseUserHash(hash) {
-                try {
-                    const cleanHash = hash.replace("#", "");
-                    const parts = cleanHash.split("|");
-                    this.owner = decodeURIComponent(parts[0]);
-                    this.tasks = JSON.parse(atob(parts[1]));
-
-                    document.getElementById('page-title').textContent = `${this.owner}'s Key System`;
-                    this.renderStep();
-                } catch (e) {
-                    Swal.fire('Error', 'Invalid or corrupted generator link!', 'error');
-                }
-            },
-
-            renderStep() {
-                const container = document.getElementById('step-container');
-                const lastKeyDate = localStorage.getItem("vezc_key_date_" + this.owner);
-                const today = new Date().toDateString();
-
-                if (lastKeyDate === today) {
-                    container.innerHTML = `
-                        <div class="step-box" style="text-align:center;">
-                            <h3 style="color:var(--color-success); margin-bottom:10px;">Already Generated Today!</h3>
-                            <p>You have already generated a key for this hub today. Come back tomorrow.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                if (this.currentStep <= 3) {
-                    let taskUrl = this.tasks[this.currentStep - 1];
-                    let isDefaultTask = !taskUrl || taskUrl.trim() === "";
-                    let buttonText = isDefaultTask ? "Visit Link & Wait 10s" : "Complete Task & Continue";
-                    let taskDesc = isDefaultTask ? "Click below, wait for 10 seconds on the opened page." : `Complete the target link below (${this.currentStep}/3).`;
-
-                    container.innerHTML = `
-                        <div class="step-box">
-                            <h3 style="color:var(--color-primary); margin-bottom:8px;">Step ${this.currentStep} of 3</h3>
-                            <p style="margin-bottom:15px;">${taskDesc}</p>
-                            <button id="task-btn" class="btn" onclick="app.handleTask('${taskUrl}')">${buttonText}</button>
-                            <div id="timer-box" class="timer-text" style="display:none;">Please wait <span id="countdown">10</span> seconds...</div>
-                        </div>
-                    `;
-                } else {
-                    this.executeFinalGeneration();
-                }
-            },
-
-            handleTask(url) {
-                const btn = document.getElementById('task-btn');
-                const timerBox = document.getElementById('timer-box');
-                const countdown = document.getElementById('countdown');
-
-                const targetUrl = (!url || url.trim() === "") ? "https://www.google.com" : url;
-                window.open(targetUrl, "_blank");
-
-                btn.disabled = true;
-                timerBox.style.display = 'block';
-                let timeLeft = (!url || url.trim() === "") ? 10 : 5;
-
-                let interval = setInterval(() => {
-                    timeLeft--;
-                    countdown.textContent = timeLeft;
-                    if (timeLeft <= 0) {
-                        clearInterval(interval);
-                        btn.disabled = false;
-                        timerBox.style.display = 'none';
-                        btn.textContent = "Continue to Next Step";
-                        btn.onclick = () => {
-                            window.app.currentStep++;
-                            window.app.renderStep();
-                        };
-                    }
-                }, 1000);
-            },
-
-            async executeFinalGeneration() {
-                const container = document.getElementById('step-container');
-                container.innerHTML = `<div style="text-align:center;padding:20px;"><p>Generating your secure key...</p></div>`;
-
-                const r1 = Math.floor(1000 + Math.random() * 9000);
-                const r2 = Math.floor(1000 + Math.random() * 9000);
-                const r3 = Math.floor(1000 + Math.random() * 9000);
-                const newKey = `${this.owner}-${r1}-${r2}-${r3}`;
-                const expiryTime = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
-
-                try {
-                    await setDoc(doc(db, "keys", newKey), {
-                        key: newKey,
-                        owner: this.owner,
-                        expiryTime: expiryTime,
-                        used: false,
-                        created: new Date().toISOString()
-                    });
-
-                    localStorage.setItem("vezc_key_date_" + this.owner, new Date().toDateString());
-
-                    container.innerHTML = `
-                        <div class="step-box" style="text-align:center;">
-                            <h3 style="color:var(--color-success); margin-bottom:10px;">Key Generated Successfully!</h3>
-                            <p style="margin-bottom:15px;">Your 24-hour access key:</p>
-                            <div style="background:#000; padding:12px; border-radius:8px; font-family:monospace; color:var(--color-primary); font-size:15px; margin-bottom:15px; word-break:break-all;">${newKey}</div>
-                            <button class="btn btn-success" onclick="navigator.clipboard.writeText('${newKey}'); Swal.fire('Copied!', 'Key copied to clipboard', 'success');">Copy Key</button>
-                        </div>
-                    `;
-                } catch (e) {
-                    Swal.fire('Error', 'Failed to save key to server!', 'error');
-                }
+                Swal.fire('Success!', 'Your key has been generated successfully.', 'success');
+            } catch (e) {
+                Swal.fire('Error', 'Failed to generate key on server.', 'error');
             }
         };
 
-        window.app.init();
+        window.copyKey = function() {
+            const keyText = document.getElementById('final-key-text').textContent;
+            navigator.clipboard.writeText(keyText);
+            Swal.fire('Copied!', 'Key copied to clipboard.', 'success');
+        }
     </script>
 </body>
 </html>
