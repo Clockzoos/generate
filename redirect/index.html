@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strike Script - Redirecting...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        p { color: #a0a0a0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Initializing Secure Session...</h2>
+        <p>Please wait while we redirect you to Linkvertise.</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBkLQc3Lhn9Rnq2NTMezoW0eTfNDyFIFyw",
+          authDomain: "key-server-af0df.firebaseapp.com",
+          projectId: "key-server-af0df",
+          storageBucket: "key-server-af0df.firebasestorage.app",
+          messagingSenderId: "464032962986",
+          appId: "1:464032962986:web:d6abf41d878fa32102f3d3"
+        };
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getFirestore(firebaseApp);
+
+        async function initRedirect() {
+            // 1. Buat token unik server-side simulation
+            const newToken = 'TOKEN-' + Math.random().toString(36).substring(2) + Date.now();
+            
+            // 2. Simpan ke database 'sessions' dengan waktu pembuatan (timestamp)
+            await setDoc(doc(db, "sessions", newToken), {
+                createdAt: Date.now(),
+                used: false
+            });
+
+            // 3. Tentukan URL halaman utama web-mu untuk tempat kembali setelah Linkvertise selesai
+            // Contoh: https://clockzoos.github.io/generate/?token=TOKEN-xxxx
+            const mainAppUrl = window.location.origin + "/generate/"; // Sesuaikan path foldermu
+            const targetReturnUrl = encodeURIComponent(mainAppUrl + "?token=" + newToken);
+
+            // 4. Link Linkvertise-mu
+            const baseLinkvertise = "https://link-hub.net/7791978/7v5R3sGQl4S1";
+
+            // 5. Lempar user ke Linkvertise dengan membawa parameter ?r= return URL
+            window.location.href = baseLinkvertise + "?r=" + targetReturnUrl;
+        }
+
+        initRedirect();
+    </script>
+</body>
+</html>
