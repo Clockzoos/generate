@@ -55,7 +55,7 @@
         <h2>Strike Script Key Generation</h2>
         <p id="status-desc">Validating your session and link completion...</p>
 
-        <!-- Tampilan Awal Sebelum Lewati Linkvertise (Jika dibuka tanpa token) -->
+        <!-- Tampilan Jika Langsung Membuka Web Utama Tanpa Lewat Redirect / Linkvertise -->
         <div id="view-unauthorized" style="display:none;">
             <p style="color: var(--color-danger); margin-bottom: 15px;">⚠️ You have not completed the Linkvertise target!</p>
             <a href="https://clockzoos.github.io/generate/redirect/" class="btn">Start Linkvertise Process</a>
@@ -94,14 +94,12 @@
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
 
-            // Pengecekan 1: Jika tidak ada token sama sekali di URL (artinya user sok tahu mengetik link utama)
             if (!token) {
                 document.getElementById('status-desc').textContent = "Access Denied";
                 document.getElementById('view-unauthorized').style.display = 'block';
                 return;
             }
 
-            // Pengecekan 2: Cek keberadaan token di Database Firestore `key-server-af0df`
             const sessionRef = doc(db, "sessions", token);
             const sessionSnap = await getDoc(sessionRef);
 
@@ -115,7 +113,6 @@
 
             const sessionData = sessionSnap.data();
 
-            // Pengecekan 3: Cek apakah token sudah pernah dipakai sebelumnya (mencegah reuse token)
             if (sessionData.used) {
                 document.getElementById('status-desc').textContent = "Token Already Used";
                 Swal.fire('Error', 'This token has already been claimed! Please generate a new one.', 'error').then(() => {
@@ -124,7 +121,6 @@
                 return;
             }
 
-            // Jika semua valid, simpan token ke memori dan buka tombol Claim
             window.currentSessionToken = token;
             document.getElementById('status-desc').textContent = "Link successfully completed! Click below to claim.";
             document.getElementById('view-authorized').style.display = 'block';
@@ -140,9 +136,7 @@
             const sessionData = sessionSnap.data();
             const timeElapsed = (Date.now() - sessionData.createdAt) / 1000; // dalam detik
 
-            // Pengecekan 4 (Anti-Bypass Dwell Time): 
-            // Jika waktu dari pembuatan token sampai tombol claim ditekan kurang dari 7 detik, 
-            // artinya user memakai script bypass tanpa menunggu iklan Linkvertise selesai!
+            // Anti-Bypass Dwell Time (Minimal 7 detik)
             if (timeElapsed < 7) {
                 Swal.fire({
                     icon: 'error',
@@ -153,14 +147,12 @@
                 return;
             }
 
-            // Generate Key Baru (Berlaku 24 Jam)
             const r1 = Math.floor(1000 + Math.random() * 9000);
             const r2 = Math.floor(1000 + Math.random() * 9000);
             const newKey = `STRIKE-${r1}-${r2}`;
             const expiryTime = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
 
             try {
-                // Simpan key ke database 'keys' agar bisa dibaca oleh script Roblox
                 await setDoc(doc(db, "keys", newKey), {
                     key: newKey,
                     expiryTime: expiryTime,
@@ -168,10 +160,8 @@
                     created: new Date().toISOString()
                 });
 
-                // Tandai token sesi ini sebagai 'used: true' supaya tidak bisa dipakai ulang
                 await setDoc(sessionRef, { used: true }, { merge: true });
 
-                // Tampilkan Key
                 document.getElementById('view-authorized').style.display = 'none';
                 document.getElementById('status-desc').textContent = "Your 24-hour access key is ready:";
                 document.getElementById('final-key-text').textContent = newKey;
