@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VEZC-HYB Private Key System</title>
-    <link rel="icon" type="image/jpeg" href="https://i.ibb.co.com/XZJcwxzw/0f94800fa0049e5dad9ebc027bd54e3c.jpg">
+    <title>Strike Script Key Generation</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co.com/p6YWQyxK/1794896099706.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
@@ -49,8 +49,8 @@
 <body>
 
     <div class="card">
-        <img src="https://i.ibb.co.com/XZJcwxzw/0f94800fa0049e5dad9ebc027bd54e3c.jpg" class="logo" alt="Logo">
-        <h2>VEZC-HYB Key System</h2>
+        <img src="https://i.ibb.co.com/p6YWQyxK/1794896099706.jpg" class="logo" alt="Logo">
+        <h2>Strike Script Key Generation</h2>
         <p>Complete the Linkvertise target to generate your 24-hour access key.</p>
 
         <div id="step-start">
@@ -89,32 +89,29 @@
             const token = urlParams.get('token');
 
             const lvBtn = document.getElementById('linkvertise-btn');
-            // Linkvertise tujuanmu dengan parameter ?r= untuk redirect balik membawa token
             const baseLinkvertise = "https://link-hub.net/7791978/7v5R3sGQl4S1";
 
             if (token) {
-                // Jika user kembali dari Linkvertise membawa token, tampilkan tombol Claim Key
                 document.getElementById('step-start').style.display = 'none';
                 document.getElementById('step-claim').style.display = 'block';
                 window.currentSessionToken = token;
             } else {
-                // Jika baru pertama buka web, buat token baru
-                const newToken = 'TOKEN-' + Math.random().toString(36).substring(2) + Date.now();
+                let newToken = sessionStorage.getItem('strike_token');
+                if (!newToken) {
+                    newToken = 'TOKEN-' + Math.random().toString(36).substring(2) + Date.now();
+                    sessionStorage.setItem('strike_token', newToken);
+                    
+                    await setDoc(doc(db, "sessions", newToken), {
+                        createdAt: Date.now(),
+                        used: false
+                    });
+                }
                 window.currentSessionToken = newToken;
                 
                 const targetReturnUrl = encodeURIComponent(window.location.origin + window.location.pathname + "?token=" + newToken);
-                lvBtn.href = baseLinkvertise + "?r=" + targetReference(targetReturnUrl);
-
-                await setDoc(doc(db, "sessions", newToken), {
-                    createdAt: Date.now(),
-                    used: false
-                });
+                lvBtn.href = baseLinkvertise + "?r=" + targetReturnUrl;
             }
         });
-
-        function targetReference(returnUrl) {
-            return returnUrl;
-        }
 
         window.verifyAndClaimKey = async function() {
             const token = window.currentSessionToken;
@@ -134,8 +131,7 @@
             const sessionData = sessionSnap.data();
             const timeElapsed = (Date.now() - sessionData.createdAt) / 1000;
 
-            // Cek apakah waktu kembali kurang dari 7 detik (indikasi bypass cepat)
-            if (timeElapsed < 7) {
+            if (timeElapsed < 5) {
                 Swal.fire('Bypass Detected!', 'You completed the steps too fast! Please do it legitimately.', 'error');
                 return;
             }
@@ -147,7 +143,7 @@
 
             const r1 = Math.floor(1000 + Math.random() * 9000);
             const r2 = Math.floor(1000 + Math.random() * 9000);
-            const newKey = `VEZC-${r1}-${r2}`;
+            const newKey = `STRIKE-${r1}-${r2}`;
             const expiryTime = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
 
             try {
